@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>ArchDraw</title>
+</head>
+<style type="text/css">
+html,body{
+	margin:0;
+	overflow:hidden;
+}
+	canvas{
+		width: 100vw;
+		height: 100vh;
+	}
+</style>
+<body>
+
+</body>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.16/p5.min.js
+"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.16/addons/p5.dom.min.js
+"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsfeat/0.0.8/jsfeat-min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.5/dat.gui.min.js"></script>
+<script type="text/javascript">
+var img,canvas;
+function preload(){
+	img=loadImage('test.jpg');
+}
+  var demo_opt = function(){
+                this.threshold = 20;
+            }
+function setup(){
+    canvas=createCanvas(640,480);
+
+    textFont(12);
+    pixelDensity(1);
+    img_u8 = new jsfeat.matrix_t(640, 480, jsfeat.U8_t | jsfeat.C1_t);
+
+     corners = [];
+     var i = 640*480;
+      while(--i >= 0) {
+        corners[i] = new jsfeat.keypoint_t(0,0,0,0);
+       }
+
+     threshold = 20;
+
+      jsfeat.fast_corners.set_threshold(threshold);
+
+}
+
+function owd(mX,mY){
+
+	var pixind=4*(mX+mY*width);
+	return [pixels[pixind],pixels[pixind+1],pixels[pixind+2],pixels[pixind+3]];
+
+}
+function align(Q,t){
+	var rem=Q%t;
+	if(rem>t/2){
+		return Q-rem+t;
+	}
+	else return Q-rem;
+}
+function draw(){
+	image(img,0,0,width,height);
+	var ctx=document.getElementById('defaultCanvas0').getContext('2d');
+	var imageData = ctx.getImageData(0, 0, 640, 480);
+	jsfeat.imgproc.grayscale(imageData.data, 640, 480, img_u8);
+    var count = jsfeat.fast_corners.detect(img_u8, corners, 5);
+
+    fill(255,0,0);
+    corners.sort(function(a, b) {
+    return -(a.score) + (b.score);
+});
+
+    for(var i=0;i<15;i++){
+    	var node=corners[i];
+    	//apply transformations on c.x,c.y
+    	corners[i].XX=align(corners[i].x,30);
+    	corners[i].YY=align(corners[i].y,30);
+    	strokeWeight(2);
+    	ellipse(corners[i].XX,corners[i].YY,20,20);
+    }
+    fill(255);
+
+   // rect(0,0,width,height);
+    fill(255,0,0);
+
+       for(var i=0;i<15;i++){
+    	   for(var j=0;j<15;j++){
+    	if(corners[i].XX==corners[j].XX || corners[i].YY==corners[j].YY){
+    		strokeWeight(10);
+    		line(corners[i].XX,corners[i].YY,corners[j].XX,corners[j].YY);
+    	}
+    }
+    }
+
+
+                    // render result back to canvas
+    // var data_u32 = new Uint32Array(imageData.data.buffer);
+    // render_corners(corners, count, data_u32, 640);
+
+    // ctx.putImageData(imageData, 0, 0);
+//noLoop();
+
+
+            }
+
+            // function render_corners(corners, count, img, step) {
+            //     var pix = (0xff << 24) | (0x00 << 16) | (0xff << 8) | 0x00;
+            //     for(var i=0; i < count; ++i)
+            //     {
+            //         var x = corners[i].x;
+            //         var y = corners[i].y;
+            //         var off = (x + y * step);
+            //         img[off] = pix;
+            //         img[off-1] = pix;
+            //         img[off+1] = pix;
+            //         img[off-step] = pix;
+            //         img[off+step] = pix;
+            //     }
+            // }
+
+
+function colorDistance(r1,g1,b1,r2,g2,b2){
+    var dr = r1 - r2;
+    var dg = g1 - g2;
+    var db = b1 - b2;
+    return  (dr*dr + dg*dg + db*db)/3;
+}
+function computeDistanceData(n){
+
+    var x,y;
+    var data = [];
+    for( x=0; x<width; x++ ){
+        for( y=0; y<height; y++ ){
+            data.push( {
+                x: x,
+                y: y,
+                d: sumDistance(x,y,n)
+            } );
+        }
+    }
+
+    return data;
+}
+function byDecreasingD(a,b){
+    return b.d - a.d;
+}
+function findCorners(apertureSize,numPoints){
+
+
+    // Compute and return the results
+    var results = computeDistanceData(apertureSize);
+    hpp=results.sort(byDecreasingD).slice(0,numPoints);
+    console.log(hpp);
+}
+function sumDistance(x,y,n){
+
+    // position information
+    var px, py, i, j, pos;
+
+    // distance accumulator
+    var dSum = 0;
+
+    // colors
+    var r1 = pixels[4*(width*y+x) + 0];
+    var g1 = pixels[4*(width*y+x) + 1];
+    var b1 = pixels[4*(width*y+x) + 2];
+    var r2, g2, b2;
+
+    for( i=-n; i<=n; i+=1 ){
+        for( j=-n; j<=n; j+=1 ){
+
+            // Tile the image if we are at an end
+            px = (x+i) % width;
+            px = (px>0)?px:-px;
+            py = (y+j) % height;
+            py = (py>0)?py:-py;
+
+            // Get the colors of this pixel
+            pos = 4*(width*py + px);
+            r2 = pixels[pos+0];
+            g2 = pixels[pos+1];
+            b2 = pixels[pos+2];
+
+            // Work with the pixel
+            dSum += colorDistance(r1,g1,b1,r2,g2,b2);
+        }
+    }
+
+    return dSum;
+}
+
+</script>
+</html>
