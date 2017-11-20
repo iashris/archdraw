@@ -25,8 +25,8 @@ Hence, I apologize to all Image Processing enthusiasts who may get irked and won
 ## What's happening
 
 I am using jsfeat's corner detection algorithm to get corners and draw straight lines through them to make the walls. 
-That's all so far. Abhi next phase ki logic hogi to avoid drawing a wall if the user hasn't drawn a line do corners ke beech.
-Second, there will be khidki and darwaze in the walls which we shall indicate by just breaks in the walls. We have to figure out a way to implement that.
+That's all so far. The next feature would be to avoid drawing a wall if the user hasn't drawn a line between two corners.
+Second, there will be windows and doors in/on the walls which will be indicated by breaks in the walls. We have to figure out a way to implement that.
 
 ## Goals
 
