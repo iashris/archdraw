@@ -27,6 +27,7 @@ Hence, I apologize to all Image Processing enthusiasts who may get irked and won
 I am using jsfeat's corner detection algorithm to get corners and draw straight lines through them to make the walls. 
 That's all so far. The next feature would be to avoid drawing a wall if the user hasn't drawn a line between two corners.
 Second, there will be windows and doors in/on the walls which will be indicated by breaks in the walls. We have to figure out a way to implement that.
+A color palette can be added which could help the designer preview color combinations on different sections and thereby get his complete design ready using this platform.
 
 ## Goals
 
