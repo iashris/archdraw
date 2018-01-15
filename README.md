@@ -39,7 +39,7 @@ upload the image and get the results instantly.
 
 * Generate a 3D model from the output plan -> Ye thoda fight hai, magar dekhte hain. p5js has some cool WEBGL APIs which we can use. 
 
-## KWoC?
+## KWoC/CMoC?
 
 I am a better designer than I am a coder. Code to me is just another tool to design things, hence I may not be able to 
 teach you CS principles as well as some other mentors do but I can help you quickly prototype how to make an idea into a product.
